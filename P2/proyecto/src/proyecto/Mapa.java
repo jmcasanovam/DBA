@@ -26,7 +26,7 @@ public class Mapa {
                 this.alto = Integer.parseInt(linea);
                 linea = br.readLine();
                 if(linea != null){
-                    this.alto = Integer.parseInt(linea);
+                    this.ancho = Integer.parseInt(linea);
                     while ((linea = br.readLine()) != null) {
                        String[] lista = linea.split("\t");
                        for(String valor : lista){
