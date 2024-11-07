@@ -9,24 +9,17 @@ public class Casilla {
     private int columna;
     private int pasos;//Numero de veces por las que ha pasado en esta casilla
     private int valor;//Representa si hay muro, si esta libre...
-    private int heuristica;
-
-    public Casilla(int fila, int columna, int valor, int objetivoFila, int objetivoColumna) {
-        this.columna = columna;
-        this.fila = fila;
-        this.valor = valor;
-        this.pasos = 0;
-        calcularHeuristica(objetivoFila, objetivoColumna);
-    }
 
     public Casilla(int fila, int columna, int valor) {
         this.columna = columna;
         this.fila = fila;
         this.valor = valor;
+        this.pasos = 0;
     }
     
     public Casilla(){
         this.valor = -3;
+        this.pasos = 0;
     }
 
     public void setValor(int valor) {
@@ -35,12 +28,6 @@ public class Casilla {
     
     public void sumarPaso(){
         this.pasos++;
-    }
-    
-    private void calcularHeuristica(int objetivoFila, int objetivoColumna){
-        //Calcular mediante distancia Manhattan o similar
-        this.heuristica = Math.abs((objetivoFila - fila) + (objetivoColumna - columna));
-        
     }
     
     
@@ -61,9 +48,7 @@ public class Casilla {
         return valor;
     }
 
-    public int getHeuristica() {
-        return heuristica;
-    }
+    
     
     
     

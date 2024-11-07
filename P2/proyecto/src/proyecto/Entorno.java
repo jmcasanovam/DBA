@@ -37,6 +37,7 @@ public class Entorno {
         columnaObjetivo = columnaO;
 
         this.jugador = new Agente(filaJ, columnaJ, filaObjetivo, columnaObjetivo);
+        mostrarMapa();
     }
 
     private void leerMapa() {
@@ -73,7 +74,7 @@ public class Entorno {
     }
 
     public void mostrarMapa() {
-        System.out.println("Mapa2:");
+        System.out.println("Mapa:");
         for (int i = 0; i < alto; i++) {
             for (int j = 0; j < ancho; j++) {
                 if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
@@ -88,12 +89,14 @@ public class Entorno {
         }
     }
 
-    private void ejecucion() {
+    public void ejecucion() {
         while (jugador.getFilaActual() != filaObjetivo && jugador.getColumnaActual() != columnaObjetivo) {
             mapa.get(jugador.getFilaActual()*ancho + jugador.getColumnaActual()).sumarPaso();
             cargarVision();
             jugador.moverse();
+            mostrarMapa();
         }
+        jugador.finalizar();
     }
 
     public void cargarVision() {
