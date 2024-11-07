@@ -14,9 +14,12 @@ public class Proyecto {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Mapa2 mapa = new Mapa2();
-        mapa.leerMapa("/home/jcasmar/Documentos/4_IIFO/DBA/DBA_compartida/DBA/P2/Pr2-maps/mapWithComplexObstacle1.txt");
+        Entorno mapa = new Entorno("/home/jcasmar/Documentos/4_IIFO/DBA/DBA_compartida/DBA/P2/Pr2-maps/mapWithComplexObstacle1.txt", 0,0,3,3);//pasamos posicion jugador y posicion objetivo
         mapa.mostrarMapa();
+        mapa.cargarVision();
+        
+        
+
     }
     
 }

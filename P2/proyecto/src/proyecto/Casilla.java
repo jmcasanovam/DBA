@@ -25,7 +25,17 @@ public class Casilla {
         this.valor = valor;
     }
     
+    public Casilla(){
+        this.valor = -3;
+    }
+
+    public void setValor(int valor) {
+        this.valor = valor;
+    }
     
+    public void sumarPaso(){
+        this.pasos++;
+    }
     
     private void calcularHeuristica(int objetivoFila, int objetivoColumna){
         //Calcular mediante distancia Manhattan o similar
