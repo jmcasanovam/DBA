@@ -38,12 +38,14 @@ public class Agente {
         //Compruebo si tiene muro
         for(int i=0; i<8; i++){
             if(vision.get(i).getValor() == -1){
-                peso.set(i, peso.get(i)-100);
+                peso.set(i, -100);
             }
             
             //Restarle a cada casilla el numero de pasos que tenga x5
-            peso.set(i, vision.get(i).getPasos()*-5);
+            peso.set(i,peso.get(i) + vision.get(i).getPasos()*(-10));
         }
+        
+
         
         //Compruebo si hay muros en la diagonal
         if(vision.get(1).getValor() == -1 && vision.get(7).getValor() == -1){
@@ -68,68 +70,141 @@ public class Agente {
 
         
         if(absX > absY){
-            if(x>0 && y>0){//Arriba +4, Arriba Izq +3, Izq +2, Arriba Dch +1
-                peso.set(1, peso.get(1)+4);
-                peso.set(0, peso.get(0)+3);
-                peso.set(7, peso.get(7)+2);
-                peso.set(2, peso.get(2)+1);
-
-            }
-            else if(x>0 && y<0){//Arriba +4, Arriba Dcha +3, Dcha +2, Arriba Izq +1
-                peso.set(1, peso.get(1)+4);
-                peso.set(2, peso.get(2)+3);
-                peso.set(3, peso.get(3)+2);
-                peso.set(0, peso.get(0)+1);
-
-            }
-            else if(x<0 && y>0){//Abajo +4, Abajo Izq +3, Izq +2, Abajo Dcha +1
-                peso.set(5, peso.get(5)+4);
+            if(x>0 && y>0){//Arriba +7, Arriba Izq +6, Izq +5, Arriba Dcha +4, Abajo Izq +3, Dcha +2, Abajo +1
+                peso.set(1, peso.get(1)+7);
+                peso.set(0, peso.get(0)+6);
+                peso.set(7, peso.get(7)+5);
+                peso.set(2, peso.get(2)+4);
                 peso.set(6, peso.get(6)+3);
-                peso.set(7, peso.get(5)+2);
-                peso.set(4, peso.get(4)+1);
+                peso.set(3, peso.get(3)+2);
+                peso.set(5, peso.get(5)+1);
 
             }
-            else{//Abajo +4, Abajo Dcha +3, Dcha +2, Abajo Izq +1
-                peso.set(5, peso.get(5)+4);
+            else if(x>0 && y<0){//Arriba +7, Arriba Dcha +6, Dcha +5, Arriba Izq +4, Abajo Dcha +3, Izq +2, Abajo +1
+                peso.set(1, peso.get(1)+7);
+                peso.set(2, peso.get(2)+6);
+                peso.set(3, peso.get(3)+5);
+                peso.set(0, peso.get(0)+4);
                 peso.set(4, peso.get(4)+3);
-                peso.set(3, peso.get(3)+2);
-                peso.set(6, peso.get(5)+1);
+                peso.set(7, peso.get(7)+2);
+                peso.set(5, peso.get(5)+1);
 
+            }
+            else if(x<0 && y>0){//Abajo +7, Abajo Izq +6, Izq +5, Abajo Dcha +4, Arriba Izq +3, Dcha +2, Arriba +1
+                peso.set(5, peso.get(5)+7);
+                peso.set(6, peso.get(6)+6);
+                peso.set(7, peso.get(5)+5);
+                peso.set(4, peso.get(4)+4);
+                peso.set(0, peso.get(0)+3);
+                peso.set(3, peso.get(3)+2);
+                peso.set(1, peso.get(1)+1);
+
+            }
+            else{//Abajo +7, Abajo Dcha +6, Dcha +5, Abajo Izq +4, Arriba Dcha +3, Izq +2, Arriba +1
+                peso.set(5, peso.get(5)+7);
+                peso.set(4, peso.get(4)+6);
+                peso.set(3, peso.get(3)+5);
+                peso.set(6, peso.get(6)+4);
+                peso.set(2, peso.get(2)+3);
+                peso.set(7, peso.get(7)+2);
+                peso.set(1, peso.get(1)+1);
                 
             }
         }
         else if(absX < absY){
-            
+            if(x>0 && y>0){//Izq +7, Arriba Izq +6, Arriba +5, Abajo Izq +4, Arriba Dcha +3, Abajo +2, Dcha +1
+                peso.set(7, peso.get(7)+7);
+                peso.set(0, peso.get(0)+6);
+                peso.set(1, peso.get(1)+5);
+                peso.set(6, peso.get(6)+4);
+                peso.set(2, peso.get(2)+3);
+                peso.set(5, peso.get(5)+2);
+                peso.set(3, peso.get(3)+1);
+
+            }
+            else if(x>0 && y<0){//Dcha +7, Arriba Dcha +6, Arriba +5, Abajo Dcha +4, Arriba Izq +3, Abajo +2, Izq +1
+                peso.set(3, peso.get(3)+7);
+                peso.set(2, peso.get(2)+6);
+                peso.set(1, peso.get(1)+5);
+                peso.set(4, peso.get(4)+4);
+                peso.set(0, peso.get(0)+3);
+                peso.set(5, peso.get(5)+2);
+                peso.set(7, peso.get(7)+1);
+
+            }
+            else if(x<0 && y>0){//Izq +7, Abajo Izq +6, Abajo +5, Arriba Izq +4, Abajo Dcha +3, Arriba +2, Dcha +1
+                peso.set(7, peso.get(7)+7);
+                peso.set(6, peso.get(6)+6);
+                peso.set(5, peso.get(5)+5);
+                peso.set(0, peso.get(0)+4);
+                peso.set(4, peso.get(4)+3);
+                peso.set(1, peso.get(1)+2);
+                peso.set(3, peso.get(3)+1);
+
+            }
+            else{//Dcha +7, Abajo Dcha +6, Abajo +5, Arriba Dcha +4, Abajo Izq +3, Arriba +2, Izq +1
+                peso.set(3, peso.get(3)+7);
+                peso.set(4, peso.get(4)+6);
+                peso.set(5, peso.get(5)+5);
+                peso.set(2, peso.get(2)+4);
+                peso.set(6, peso.get(6)+3);
+                peso.set(1, peso.get(1)+2);
+                peso.set(7, peso.get(7)+1);
+                
+            }
         }
         else{
-            if(x>0 && y>0){//Arriba Izq +2 y Izq/Arriba +1
-                peso.set(0, peso.get(0)+2);
-                peso.set(7, peso.get(7)+1);
-                peso.set(1, peso.get(1)+1);
-            }
-            else if(x>0 && y<0){//Arriba Derecha +2 y Arriba/Derecha +1
+            if(x>0 && y>0){//Arriba Izq +4, Arriba +3, Izq +3, Arriba Dcha +2, Abajo Izq +2, Dcha +1, Abajo +1
+                peso.set(0, peso.get(0)+4);
+                peso.set(1, peso.get(1)+3);
+                peso.set(7, peso.get(7)+3);
                 peso.set(2, peso.get(2)+2);
-                peso.set(3, peso.get(3)+1);
-                peso.set(1, peso.get(1)+1);
-            }
-            else if(x<0 && y>0){//Abajo Izq +2 y Izq/Abajo +1
                 peso.set(6, peso.get(6)+2);
+                peso.set(3, peso.get(3)+1);
+                peso.set(5, peso.get(5)+1);
+                
+            }
+            else if(x>0 && y<0){//Arriba Derecha +4, Arriba+3, Derecha +3, Arriba Izq+2, Abajo Dcha +2, Izq +1, Abajo +1
+                peso.set(2, peso.get(2)+4);
+                peso.set(1, peso.get(1)+3);
+                peso.set(3, peso.get(3)+3);
+                peso.set(0, peso.get(0)+2);
+                peso.set(4, peso.get(4)+2);
                 peso.set(7, peso.get(7)+1);
                 peso.set(5, peso.get(5)+1);
             }
-            else{//Abajo Derecha +2 y Abajo/Dch +1
+            else if(x<0 && y>0){//Abajo Izq +4, Abajo +3, Izq +3, Abajo Dcha +2, Arriba Izq +2, Dcha +1, Arriba +1
+                peso.set(6, peso.get(6)+4);
+                peso.set(7, peso.get(7)+3);
+                peso.set(5, peso.get(5)+3);
+                peso.set(0, peso.get(0)+2);
                 peso.set(4, peso.get(4)+2);
-                peso.set(5, peso.get(5)+1);
+                peso.set(1, peso.get(1)+1);
                 peso.set(3, peso.get(3)+1);
+            }
+            else{//Abajo Derecha +4, Abajo+3, Derecha +3, Abajo Izq+2, Arriba Dcha +2, Izq +1, Arriba +1
+                peso.set(4, peso.get(4)+4);
+                peso.set(3, peso.get(3)+3);
+                peso.set(5, peso.get(5)+3);
+                peso.set(6, peso.get(6)+2);
+                peso.set(2, peso.get(2)+2);
+                peso.set(7, peso.get(7)+1);
+                peso.set(1, peso.get(1)+1);
                 
             }
         }
         
+        //Buscamos el mejor
+        int mejor = 0;
+        int valor = peso.get(0);
+        for(int i=1; i< 8; i++ ){
+            if(peso.get(i) > valor){
+                valor = peso.get(i);
+                mejor = i;
+            }
+        }
         
-        
-        
-        
-        return 4;
+        return mejor;
     }
     
     public void moverse(){

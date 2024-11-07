@@ -14,7 +14,7 @@ public class Proyecto {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Entorno entorno = new Entorno("/home/jcasmar/Documentos/4_IIFO/DBA/DBA_compartida/DBA/P2/Pr2-maps/mapWithComplexObstacle1.txt", 0,0,3,3);//pasamos posicion jugador y posicion objetivo
+        Entorno entorno = new Entorno("/home/jcasmar/Documentos/4_IIFO/DBA/DBA_compartida/DBA/P2/Pr2-maps/mapWithComplexObstacle1.txt", 7,2,5,5);//pasamos posicion jugador y posicion objetivo
         entorno.ejecucion();
         
         

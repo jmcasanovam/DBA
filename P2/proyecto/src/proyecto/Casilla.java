@@ -48,6 +48,10 @@ public class Casilla {
         return valor;
     }
 
+    public void setPasos(int pasos) {
+        this.pasos = pasos;
+    }
+
     
     
     

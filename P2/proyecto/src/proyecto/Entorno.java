@@ -90,8 +90,16 @@ public class Entorno {
     }
 
     public void ejecucion() {
-        while (jugador.getFilaActual() != filaObjetivo && jugador.getColumnaActual() != columnaObjetivo) {
+        while (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
             mapa.get(jugador.getFilaActual()*ancho + jugador.getColumnaActual()).sumarPaso();
+//            for (int i=0; i<ancho; i++){
+//                for(int j=0; j<alto; j++){
+//                    System.out.print(mapa.get(i*ancho+j).getPasos()+" ");
+//                }
+//                System.out.println();
+//            }
+            
+            
             cargarVision();
             jugador.moverse();
             mostrarMapa();
@@ -130,28 +138,37 @@ public class Entorno {
 
         if(vision.get(0).getValor() == -3){
             vision.get(0).setValor(getValorMapa(jugador.getFilaActual()-1, jugador.getColumnaActual()-1));
+            vision.get(0).setPasos(mapa.get((jugador.getFilaActual()-1)*ancho + jugador.getColumnaActual()-1).getPasos());
         }
         if(vision.get(1).getValor() == -3){
             vision.get(1).setValor(getValorMapa(jugador.getFilaActual()-1, jugador.getColumnaActual()));
+            vision.get(1).setPasos(mapa.get((jugador.getFilaActual()-1)*ancho + jugador.getColumnaActual()).getPasos());
+
         }
         if(vision.get(2).getValor() == -3){
             vision.get(2).setValor(getValorMapa(jugador.getFilaActual()-1, jugador.getColumnaActual()+1));
+            vision.get(2).setPasos(mapa.get((jugador.getFilaActual()-1)*ancho + jugador.getColumnaActual()+1).getPasos());
         }
         
         if(vision.get(3).getValor() == -3){
             vision.get(3).setValor(getValorMapa(jugador.getFilaActual(), jugador.getColumnaActual()+1));
+            vision.get(3).setPasos(mapa.get((jugador.getFilaActual())*ancho + jugador.getColumnaActual()+1).getPasos());
         }
         if(vision.get(4).getValor() == -3){
             vision.get(4).setValor(getValorMapa(jugador.getFilaActual()+1, jugador.getColumnaActual()+1));
+            vision.get(4).setPasos(mapa.get((jugador.getFilaActual()+1)*ancho + jugador.getColumnaActual()+1).getPasos());
         }
         if(vision.get(5).getValor() == -3){
             vision.get(5).setValor(getValorMapa(jugador.getFilaActual()+1, jugador.getColumnaActual()));
+            vision.get(5).setPasos(mapa.get((jugador.getFilaActual()+1)*ancho + jugador.getColumnaActual()).getPasos());
         }
         if(vision.get(6).getValor() == -3){
             vision.get(6).setValor(getValorMapa(jugador.getFilaActual()+1, jugador.getColumnaActual()-1));
+            vision.get(6).setPasos(mapa.get((jugador.getFilaActual()+1)*ancho + jugador.getColumnaActual()-1).getPasos());
         }
         if(vision.get(7).getValor() == -3){
             vision.get(7).setValor(getValorMapa(jugador.getFilaActual(), jugador.getColumnaActual()-1));
+            vision.get(7).setPasos(mapa.get((jugador.getFilaActual())*ancho + jugador.getColumnaActual()-1).getPasos());
         }
 
         this.jugador.actualizarVision(vision);
