@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 
 /**
  *
@@ -19,6 +20,9 @@ public class Entorno {
     private int filaObjetivo;
     private int columnaObjetivo;
     private Agente jugador;
+    
+    private MapaVisual panelMapa;
+    private JFrame frame;
 
     public Entorno(String nombreArchivo, int filaJ, int columnaJ, int filaO, int columnaO) {
 
@@ -37,7 +41,39 @@ public class Entorno {
         columnaObjetivo = columnaO;
 
         this.jugador = new Agente(filaJ, columnaJ, filaObjetivo, columnaObjetivo);
+        configurarInterfaz();
         mostrarMapa();
+    }
+    
+    private void configurarInterfaz() {
+        frame = new JFrame("Mapa Visual");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Crear el mapa inicial para el panel
+        int[][] mapaInicial = convertirMapa();
+
+        panelMapa = new MapaVisual(mapaInicial);
+        frame.add(panelMapa);
+
+        frame.setSize(ancho * 50 + 20, alto * 50 + 40); // Tamaño dinámico
+        frame.setVisible(true);
+    }
+    
+    private int[][] convertirMapa() {
+        int[][] matriz = new int[alto][ancho];
+        for (int i = 0; i < alto; i++) {
+            for (int j = 0; j < ancho; j++) {
+                Casilla casilla = mapa.get(i * ancho + j);
+                if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
+                    matriz[i][j] = 1; // Jugador
+                } else if (i == filaObjetivo && j == columnaObjetivo) {
+                    matriz[i][j] = 2; // Objetivo
+                } else {
+                    matriz[i][j] = casilla.getValor();
+                }
+            }
+        }
+        return matriz;
     }
 
     private void leerMapa() {
@@ -74,35 +110,41 @@ public class Entorno {
     }
 
     public void mostrarMapa() {
-        System.out.println("Mapa:");
-        for (int i = 0; i < alto; i++) {
-            for (int j = 0; j < ancho; j++) {
-                if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
-                    System.out.print("1" + "\t");
-                } else if (i == filaObjetivo && j == columnaObjetivo) {
-                    System.out.print("2" + "\t");
-                } else {
-                    System.out.print(mapa.get(i * ancho + j).getValor() + "\t");  // Imprimir cada valor con tabulador
-                }
-            }
-            System.out.println();  // Nueva linea despues de cada fila
-        }
+//        System.out.println("Mapa:");
+//        for (int i = 0; i < alto; i++) {
+//            for (int j = 0; j < ancho; j++) {
+//                if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
+//                    System.out.print("1" + "\t");
+//                } else if (i == filaObjetivo && j == columnaObjetivo) {
+//                    System.out.print("2" + "\t");
+//                } else {
+//                    System.out.print(mapa.get(i * ancho + j).getValor() + "\t");  // Imprimir cada valor con tabulador
+//                }
+//            }
+//            System.out.println();  // Nueva linea despues de cada fila
+//        }
+        int[][] mapaVisual = convertirMapa();
+        panelMapa.actualizarMapa(mapaVisual); // Actualiza la visualización gráfica
+   
     }
+    
+    private void esperarUnSegundo() {
+    try {
+        Thread.sleep(1000); // Pausa de 1 segundo
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt(); // Restablece el estado de interrupción del hilo
+        System.err.println("Error en el delay: " + e.getMessage());
+    }
+}
 
     public void ejecucion() {
         while (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
             mapa.get(jugador.getFilaActual()*ancho + jugador.getColumnaActual()).sumarPaso();
-//            for (int i=0; i<ancho; i++){
-//                for(int j=0; j<alto; j++){
-//                    System.out.print(mapa.get(i*ancho+j).getPasos()+" ");
-//                }
-//                System.out.println();
-//            }
-            
-            
+                        
             cargarVision();
             jugador.moverse();
             mostrarMapa();
+            esperarUnSegundo();
         }
         jugador.finalizar();
     }
