@@ -25,7 +25,7 @@ public class Proyecto extends Agent {
 
             // Crear y ejecutar el agente "Entorno" pasando los parámetros necesarios
             Object[] parameters = new Object[]{
-                "/home/jcasmar/Documentos/4_IIFO/DBA/DBA_compartida/DBA/P2/Pr2-maps/mapWithComplexObstacle1.txt",
+                "../Pr2-maps/mapWithComplexObstacle1.txt",
                 7, 2, 5, 5 // Pasamos parámetros al constructor del agente
             };
 
