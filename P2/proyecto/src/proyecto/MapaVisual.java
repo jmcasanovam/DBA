@@ -41,30 +41,4 @@ public class MapaVisual extends JPanel {
         repaint(); // Redibuja el panel con el nuevo mapa
     }
 
-    public static void main(String[] args) {
-        // Mapa inicial
-        int[][] mapaEjemplo = {
-            {0, 0, -1, 0, 2},
-            {0, -1, 0, 0, 0},
-            {1, 0, 0, -1, 0},
-            {0, 0, 0, 0, 0}
-        };
-
-        // Configuración de la ventana
-        JFrame frame = new JFrame("Mapa Visual");
-        MapaVisual panelMapa = new MapaVisual(mapaEjemplo);
-
-        frame.add(panelMapa);
-        frame.setSize(300, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-
-        // Simulación de movimientos del jugador
-        new Timer(1000, e -> {
-            // Actualizar posición del jugador (ejemplo)
-            mapaEjemplo[2][0] = 0; // Borra la posición anterior
-            mapaEjemplo[1][0] = 1; // Nueva posición del jugador
-            panelMapa.actualizarMapa(mapaEjemplo); // Actualiza el mapa visual
-        }).start();
-    }
 }

@@ -8,10 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 
-/**
- *
- * @author jcasmar Hace la funcion de entorno
- */
 public class Entorno extends Agent {
 
     private ArrayList<Casilla> mapa;
@@ -26,7 +22,6 @@ public class Entorno extends Agent {
     private MapaVisual panelMapa;
     private JFrame frame;
 
-// Constructor sin parámetros
     public Entorno() {
         this.mapa = new ArrayList<>();
         this.alto = 0;
@@ -256,7 +251,7 @@ public class Entorno extends Agent {
             configurarInterfaz();
 
             // Añadir el comportamiento de ejecución
-            addBehaviour(new TickerBehaviour(this, 1000) {
+            addBehaviour(new TickerBehaviour(this, 500) {
                 @Override
                 protected void onTick() {
                     if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
