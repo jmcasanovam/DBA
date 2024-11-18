@@ -101,6 +101,25 @@ public class Agente {
                 peso.set(1, peso.get(1)+1);
 
             }
+            else if(x<0 && y==0){//Abajo +4, Abajo Izq +3, Abajo Dcha +3, Izq +2, Dcha +2, Arriba Izq +1, Arriba Dcha +1
+                peso.set(5, peso.get(5)+4);
+                peso.set(6, peso.get(6)+3);
+                peso.set(4, peso.get(4)+3);
+                peso.set(7, peso.get(7)+2);
+                peso.set(3, peso.get(3)+2);
+                peso.set(0, peso.get(0)+1);
+                peso.set(2, peso.get(2)+1);
+
+            }
+            else if(x>0 && y==0){//Arriba +4, Arriba Izq +3, Arriba Dcha +3, Izq +2, Dcha +2, Abajo Izq +1, Abajo Dcha +1
+                peso.set(1, peso.get(1)+4);
+                peso.set(0, peso.get(0)+3);
+                peso.set(2, peso.get(2)+3);
+                peso.set(3, peso.get(3)+2);
+                peso.set(7, peso.get(7)+2);
+                peso.set(0, peso.get(0)+1);
+                peso.set(2, peso.get(2)+1);
+            }
             else{//Abajo +7, Abajo Dcha +6, Dcha +5, Abajo Izq +4, Arriba Dcha +3, Izq +2, Arriba +1
                 peso.set(5, peso.get(5)+7);
                 peso.set(4, peso.get(4)+6);
@@ -142,6 +161,25 @@ public class Agente {
                 peso.set(1, peso.get(1)+2);
                 peso.set(3, peso.get(3)+1);
 
+            }
+            else if(x==0 && y>0){//Izq +4, Abajo Izq +3, Arriba Izq +3, Arriba +2, Abajo +2, Arriba Dcha +1, Abajo Dcha +1
+                peso.set(7, peso.get(7)+4);
+                peso.set(6, peso.get(6)+3);
+                peso.set(0, peso.get(0)+3);
+                peso.set(1, peso.get(1)+2);
+                peso.set(5, peso.get(5)+2);
+                peso.set(2, peso.get(2)+1);
+                peso.set(4, peso.get(4)+1);
+
+            }
+            else if(x==0 && y<0){//Dcha +4, Abajo Dcha +3, Arriba Dcha +3, Arriba +2, Abajo +2, Arriba Izq +1, Abajo Izq +1
+                peso.set(3, peso.get(3)+4);
+                peso.set(4, peso.get(4)+3);
+                peso.set(2, peso.get(2)+3);
+                peso.set(1, peso.get(1)+2);
+                peso.set(5, peso.get(5)+2);
+                peso.set(0, peso.get(0)+1);
+                peso.set(6, peso.get(6)+1);
             }
             else{//Dcha +7, Abajo Dcha +6, Abajo +5, Arriba Dcha +4, Abajo Izq +3, Arriba +2, Izq +1
                 peso.set(3, peso.get(3)+7);
