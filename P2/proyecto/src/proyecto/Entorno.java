@@ -1,15 +1,17 @@
 package proyecto;
 
+import jade.core.Agent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 
 /**
  *
  * @author jcasmar Hace la funcion de entorno
  */
-public class Entorno {
+public class Entorno extends Agent{
 
     private ArrayList<Casilla> mapa;
     private int alto;
@@ -19,7 +21,18 @@ public class Entorno {
     private int filaObjetivo;
     private int columnaObjetivo;
     private Agente jugador;
+    
+    private MapaVisual panelMapa;
+    private JFrame frame;
+ 
 
+// Constructor sin parámetros
+    public Entorno() {
+        this.mapa = new ArrayList<>();
+        this.alto = 0;
+        this.ancho = 0;
+        this.nombreArchivo = "";
+    }
     public Entorno(String nombreArchivo, int filaJ, int columnaJ, int filaO, int columnaO) {
 
         this.mapa = new ArrayList<>();
@@ -37,7 +50,39 @@ public class Entorno {
         columnaObjetivo = columnaO;
 
         this.jugador = new Agente(filaJ, columnaJ, filaObjetivo, columnaObjetivo);
+        configurarInterfaz();
         mostrarMapa();
+    }
+    
+    private void configurarInterfaz() {
+        frame = new JFrame("Mapa Visual");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Crear el mapa inicial para el panel
+        int[][] mapaInicial = convertirMapa();
+
+        panelMapa = new MapaVisual(mapaInicial);
+        frame.add(panelMapa);
+
+        frame.setSize(ancho * 50 + 20, alto * 50 + 40); // Tamaño dinámico
+        frame.setVisible(true);
+    }
+    
+    private int[][] convertirMapa() {
+        int[][] matriz = new int[alto][ancho];
+        for (int i = 0; i < alto; i++) {
+            for (int j = 0; j < ancho; j++) {
+                Casilla casilla = mapa.get(i * ancho + j);
+                if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
+                    matriz[i][j] = 1; // Jugador
+                } else if (i == filaObjetivo && j == columnaObjetivo) {
+                    matriz[i][j] = 2; // Objetivo
+                } else {
+                    matriz[i][j] = casilla.getValor();
+                }
+            }
+        }
+        return matriz;
     }
 
     private void leerMapa() {
@@ -74,20 +119,32 @@ public class Entorno {
     }
 
     public void mostrarMapa() {
-        System.out.println("Mapa:");
-        for (int i = 0; i < alto; i++) {
-            for (int j = 0; j < ancho; j++) {
-                if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
-                    System.out.print("1" + "\t");
-                } else if (i == filaObjetivo && j == columnaObjetivo) {
-                    System.out.print("2" + "\t");
-                } else {
-                    System.out.print(mapa.get(i * ancho + j).getValor() + "\t");  // Imprimir cada valor con tabulador
-                }
-            }
-            System.out.println();  // Nueva linea despues de cada fila
-        }
+//        System.out.println("Mapa:");
+//        for (int i = 0; i < alto; i++) {
+//            for (int j = 0; j < ancho; j++) {
+//                if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
+//                    System.out.print("1" + "\t");
+//                } else if (i == filaObjetivo && j == columnaObjetivo) {
+//                    System.out.print("2" + "\t");
+//                } else {
+//                    System.out.print(mapa.get(i * ancho + j).getValor() + "\t");  // Imprimir cada valor con tabulador
+//                }
+//            }
+//            System.out.println();  // Nueva linea despues de cada fila
+//        }
+        int[][] mapaVisual = convertirMapa();
+        panelMapa.actualizarMapa(mapaVisual); // Actualiza la visualización gráfica
+   
     }
+    
+    private void esperarUnSegundo() {
+    try {
+        Thread.sleep(1000); // Pausa de 1 segundo
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt(); // Restablece el estado de interrupción del hilo
+        System.err.println("Error en el delay: " + e.getMessage());
+    }
+}
 
     public void ejecucion() {
         while (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
@@ -98,11 +155,11 @@ public class Entorno {
 //                }
 //                System.out.println();
 //            }
-            
-            
+                        
             cargarVision();
             jugador.moverse();
             mostrarMapa();
+            esperarUnSegundo();
         }
         jugador.finalizar();
     }
@@ -179,6 +236,57 @@ public class Entorno {
         return mapa.get(fila * ancho + columna).getValor();
     }
     
-    
+     @Override
+    protected void setup() {
+ // Recuperar los parámetros pasados al agente
+        Object[] args = getArguments();
+        if (args != null && args.length == 5) {
+            // Si los parámetros son correctos, procesarlos
+            String nombreArchivo = (String) args[0];
+            int filaJ = (Integer) args[1];
+            int columnaJ = (Integer) args[2];
+            int filaO = (Integer) args[3];
+            int columnaO = (Integer) args[4];
+
+            // Llamar a un método para configurar el agente con esos parámetros
+            setup(nombreArchivo, filaJ, columnaJ, filaO, columnaO);
+        } else {
+            // Si los parámetros no son correctos, mostrar un error
+            System.out.println("Error: Los parámetros no son correctos.");
+        }
+    }
+
+    // Este es el método de configuración que recibe los parámetros
+    public void setup(String nombreArchivo, int filaJ, int columnaJ, int filaO, int columnaO) {
+        this.nombreArchivo = nombreArchivo;
+        leerMapa();
+
+        if (filaJ < 0 || columnaJ < 0 || filaO < 0 || columnaO < 0 || filaJ >= this.alto || columnaJ >= this.ancho || filaO >= alto || columnaO >= ancho) {
+            throw new IllegalArgumentException("Las coordenadas están fuera de los límites del mapa.");
+        }
+
+        filaObjetivo = filaO;
+        columnaObjetivo = columnaO;
+
+        // Crear el jugador (agente)
+        this.jugador = new Agente(filaJ, columnaJ, filaObjetivo, columnaObjetivo);
+        
+        // Configurar la interfaz de usuario y mostrar el mapa
+        configurarInterfaz();
+       
+        
+        
+        
+        while (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
+            mapa.get(jugador.getFilaActual()*ancho + jugador.getColumnaActual()).sumarPaso();
+
+                        
+            cargarVision();
+            jugador.moverse();
+            mostrarMapa();
+            esperarUnSegundo();
+        }
+        jugador.finalizar();
+    }
 
 }
