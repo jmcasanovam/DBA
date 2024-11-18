@@ -6,6 +6,7 @@ package proyecto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -257,7 +258,7 @@ public class Agente {
     }
     
     public void finalizar(){
-        System.out.println("He acabado en "+ energia + " pasos.");
+        JOptionPane.showMessageDialog(null, "He acabado en "+ energia + " pasos.", "¡Objetivo alcanzado!", JOptionPane.PLAIN_MESSAGE);
     }
     
     

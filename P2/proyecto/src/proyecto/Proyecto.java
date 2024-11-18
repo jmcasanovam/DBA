@@ -1,6 +1,5 @@
 package proyecto;
 
-import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -8,32 +7,60 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
-public class Proyecto extends Agent {
+import javax.swing.*;
+import java.io.File;
 
-    /**
-     * @param args the command line arguments
-     */
+public class Proyecto {
+
     public static void main(String[] args) {
 
         try {
-            // Configurar el perfil para el contenedor de JADE
-            Runtime rt = Runtime.instance();
-            Profile profile = new ProfileImpl();
+            // Crear un JFileChooser para seleccionar el archivo del mapa
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Selecciona un archivo de mapa");
+            int userSelection = fileChooser.showOpenDialog(null);
 
-            // Crear el contenedor donde los agentes serán ejecutados
-            AgentContainer container = rt.createAgentContainer(profile);
+            // Validar la selección del archivo
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                String mapPath = selectedFile.getAbsolutePath();
 
-            // Crear y ejecutar el agente "Entorno" pasando los parámetros necesarios
-            Object[] parameters = new Object[]{
-                "../Pr2-maps/mapWithComplexObstacle1.txt",
-                7, 2, 5, 5 // Pasamos parámetros al constructor del agente
-            };
+                // Verificar que el archivo sea un archivo de texto
+                if (!mapPath.endsWith(".txt")) {
+                    JOptionPane.showMessageDialog(null, "El archivo seleccionado no es un archivo de texto.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return; // Finalizar el programa
+                }
 
-            // Crear el agente Entorno y arrancarlo
-            AgentController agenteEntorno = container.createNewAgent("Entorno", "proyecto.Entorno", parameters);
-            agenteEntorno.start(); // Inicia el agente
+                // Solicitar al usuario las posiciones del agente y del objetivo
+                int agentRow = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la fila inicial del agente:"));
+                int agentCol = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la columna inicial del agente:"));
+                int goalRow = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la fila del  objetivo:"));
+                int goalCol = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la columna del objetivo:"));
 
-            System.out.println("Agente Entorno iniciado correctamente.");
+                // Configurar el perfil para el contenedor de JADE
+                Runtime rt = Runtime.instance();
+                Profile profile = new ProfileImpl();
+
+                // Crear el contenedor donde los agentes serán ejecutados
+                AgentContainer container = rt.createAgentContainer(profile);
+
+                // Crear y ejecutar el agente "Entorno" pasando los parámetros necesarios
+                Object[] parameters = new Object[]{
+                    mapPath, // Ruta del mapa seleccionada
+                    agentRow, agentCol, // Posición inicial del agente
+                    goalRow, goalCol // Posición objetivo
+                };
+
+                // Crear el agente Entorno y arrancarlo
+                AgentController agenteEntorno = container.createNewAgent("Entorno", "proyecto.Entorno", parameters);
+                agenteEntorno.start(); // Inicia el agente
+
+                System.out.println("Agente Entorno iniciado correctamente.");
+            } else {
+                System.out.println("No se seleccionó ningún archivo. El programa se cerrará.");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Entrada no válida. El programa se cerrará.", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (StaleProxyException e) {
             e.printStackTrace();
         } catch (Exception e) {
