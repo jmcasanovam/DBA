@@ -94,7 +94,7 @@ public class Agente {
             else if(x<0 && y>0){//Abajo +7, Abajo Izq +6, Izq +5, Abajo Dcha +4, Arriba Izq +3, Dcha +2, Arriba +1
                 peso.set(5, peso.get(5)+7);
                 peso.set(6, peso.get(6)+6);
-                peso.set(7, peso.get(5)+5);
+                peso.set(7, peso.get(7)+5);
                 peso.set(4, peso.get(4)+4);
                 peso.set(0, peso.get(0)+3);
                 peso.set(3, peso.get(3)+2);
