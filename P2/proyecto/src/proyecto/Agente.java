@@ -42,7 +42,7 @@ public class Agente {
                 peso.set(i, -100);
             }
             
-            //Restarle a cada casilla el numero de pasos que tenga x5
+            //Restarle a cada casilla el numero de pasos que tenga x10
             peso.set(i,peso.get(i) + vision.get(i).getPasos()*(-10));
         }
         
