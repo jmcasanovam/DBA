@@ -12,8 +12,11 @@ public class MapaVisual extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        int tileSize = 50; // Tamaño de cada celda
-
+        //int tileSize = 50; // Tamaño de cada celda
+        int tileWidth = getWidth() / mapa[0].length;
+        int tileHeight = getHeight() / mapa.length;
+        int tileSize = Math.min(tileWidth, tileHeight);
+        
         for (int i = 0; i < mapa.length; i++) {
             for (int j = 0; j < mapa[i].length; j++) {
                 // Dibuja diferentes colores según el valor en el mapa
