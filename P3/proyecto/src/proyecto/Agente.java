@@ -4,6 +4,33 @@
  */
 package proyecto;
 
+/*
+ * 1. Loop:
+ * 2. Le pido al elfo que me traduzca el mensaje de pedir contraseña
+ * 3. Recibo el mensaje traducido
+ * 4. Le pido a Santa la contraseña
+ * 5. Si no me la da, salto a 1
+ * 6. Si me la da, continúo
+ * 7. Le pido al elfo que me traduzca la contraseña
+ * 8. Recibo la contraseña traducida
+ * 9. Loop:
+ * 10. Le pido a Rudolph las coordenadas de un reno
+ * 11. Si me da coordenadas, salto a 13
+ * 12. Si me dice que no hay más, salto a 15
+ * 13. Actualizo las coordenadas de mi objetivo con las del reno
+ * 14. Cuando llego al objetivo, salto a 9
+ * 15. Le pido al elfo que me traduzca el mensaje de haber terminado
+ * 16. Recibo el mensaje traducido
+ * 17. Le digo a santa que he terminado
+ * 18. Santa me dice sus coordenadas
+ * 19. Le pido al elfo que me traduzca el mensaje de coordenadas
+ * 20. Actualizo las coordenadas de mi objetivo con las de santa
+ * 21. Cuando llego al objetivo, le pido al elfo que me traduzca el mensaje de haber llegado
+ * 22. Recibo el mensaje traducido
+ * 23. Le digo a santa que he llegado
+ * 24. Recibo el mensaje de "jojojo" de santa y termino
+*/
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.JOptionPane;
@@ -20,15 +47,19 @@ public class Agente {
     private ArrayList<Casilla> vision;
     private int energia;
 
-    public Agente(int filaActual, int columnaActual, int filaObjetivo, int columnaObjetivo) {
+    public Agente(int filaActual, int columnaActual) {
         this.filaActual = filaActual;
         this.columnaActual = columnaActual;
-        this.filaObjetivo = filaObjetivo;
-        this.columnaObjetivo = columnaObjetivo;
         this.vision = new ArrayList<>();
         this.energia = 0;
     }
     
+    public void setObjetivo(int filaObjetivo, int columnaObjetivo){
+        this.filaObjetivo = filaObjetivo;
+        this.columnaObjetivo = columnaObjetivo;
+    }
+
+
     public void actualizarVision(ArrayList<Casilla> nuevaVision){
         this.vision = (ArrayList<Casilla>) nuevaVision.clone();
     }

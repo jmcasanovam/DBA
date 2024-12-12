@@ -31,7 +31,7 @@ public class Entorno extends Agent {
         this.nombreArchivo = "";
     }
 
-    public Entorno(String nombreArchivo, int filaJ, int columnaJ, int filaO, int columnaO) {
+    public Entorno(String nombreArchivo, int filaJ, int columnaJ) {
 
         this.mapa = new ArrayList<>();
         this.alto = 0;
@@ -40,17 +40,41 @@ public class Entorno extends Agent {
 
         leerMapa();
 
-        if (filaJ < 0 || columnaJ < 0 || filaO < 0 || columnaO < 0 || filaJ >= this.alto || columnaJ >= this.ancho || filaO >= alto || columnaO >= ancho) {
-            throw new IllegalArgumentException("Las coordenadas están fuera de los límites del mapa.");
-        }
-
-        filaObjetivo = filaO;
-        columnaObjetivo = columnaO;
-
-        this.jugador = new Agente(filaJ, columnaJ, filaObjetivo, columnaObjetivo);
+        this.jugador = new Agente(filaJ, columnaJ);
         configurarInterfaz();
         mostrarMapa();
     }
+
+    public void ejecucion3 (){
+        // establecer canal de comunicación con el elfo
+        // mandar mensaje a elfo
+        // recibir mensaje de elfo
+        // establecer canal de comuncación con santa
+        while(mensaje de santa es malo){
+            // mandar mensaje a santa
+            // recibirlo de santa
+            // mandar mensaje a elfo
+            // recibir mensaje de elfo
+        }
+
+        int contrasena = "por favor"; // guardar contraseña recibida de santa
+        
+        // establecer canal de comunicación con rudolph
+        // pedir coordenadas a rudolf
+        while(rudolf devuelve coordenadas /*implica mandarle la contraseña y recibir un mensaje*/){
+            // rudolf te dara las coordenadas
+            int filao = 0;
+            int colo = 0;
+            this.filaObjetivo=filao;
+            this.columnaObjetivo=colo;
+            jugador.setObjetivo(filao, colo);
+            ejecucion();
+            // pedir coordenadas de nuevo
+        }
+        // al recibir 
+    }
+
+
 
     private void configurarInterfaz() {
         frame = new JFrame("Mapa Visual");
@@ -156,7 +180,7 @@ public class Entorno extends Agent {
             mostrarMapa();
             esperarUnSegundo();
         }
-        jugador.finalizar();
+        // jugador.finalizar();
     }
 
     public void cargarVision() {
@@ -235,38 +259,53 @@ public class Entorno extends Agent {
     @Override
     protected void setup() {
         Object[] args = getArguments();
-        if (args != null && args.length == 5) {
+        if (args != null && args.length == 3) {
             this.nombreArchivo = (String) args[0];
             int filaJ = (int) args[1];
             int columnaJ = (int) args[2];
-            this.filaObjetivo = (int) args[3];
-            this.columnaObjetivo = (int) args[4];
 
             this.mapa = new ArrayList<>();
             leerMapa();
 
-            if (filaJ < 0 || columnaJ < 0 || filaObjetivo < 0 || columnaObjetivo < 0 || filaJ >= this.alto || columnaJ >= this.ancho || filaObjetivo >= alto || columnaObjetivo >= ancho) {
+            if (filaJ < 0 || columnaJ < 0 || filaJ >= this.alto || columnaJ >= this.ancho) {
                 throw new IllegalArgumentException("Las coordenadas están fuera de los límites del mapa.");
             }
 
-            this.jugador = new Agente(filaJ, columnaJ, filaObjetivo, columnaObjetivo);
+            this.jugador = new Agente(filaJ, columnaJ);
             configurarInterfaz();
 
-            // Añadir el comportamiento de ejecución
-            addBehaviour(new TickerBehaviour(this, 500) {
+            // Añadir el comportamiento de pedir contraseña
+            addBehaviour(new CyclicBehaviour() {
                 @Override
-                protected void onTick() {
-                    if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
-                        mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
-                        cargarVision();
-                        jugador.moverse();
-                        mostrarMapa();
-                    } else {
-                        jugador.finalizar();
-                        stop(); // Detener el comportamiento
-                    }
+                public void action() {
+                    ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+                    msg.setConversationId("elfo-channel");
+                    myAgent.send(msg);
+
+                    ACLMessage msg = myAgent.blockingReceive();
+
+                    if(msg.getConversationId().equals())
+                    
                 }
-            });
+            }
+        );
+
+            // Añadir el comportamiento de movimiento
+                                                                        addBehaviour(new TickerBehaviour(this, 500) {
+                                                                            @Override
+                                                                            protected void onTick() {
+                                                                                if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
+                                                                                    mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
+                                                                                    
+                                                                                    cargarVision();
+                                                                                    jugador.moverse();
+                                                                                    mostrarMapa();
+                                                                                } else {
+                                                                                    jugador.finalizar();
+                                                                                    stop(); // Detener el comportamiento
+                                                                                }
+                                                                            }
+                                                                        });
         }
     }
 
