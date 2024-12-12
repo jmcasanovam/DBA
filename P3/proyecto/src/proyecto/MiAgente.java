@@ -10,7 +10,7 @@ public class MiAgente extends Agent {
     @Override
     protected void setup() {
         // Paso 1: Enviar mensaje a Santa para pedir contraseña
-        enviarMensaje("Hola Santa, ¿puedo entrar?", "solicitudPermiso", "santaClaus");
+        enviarMensajeSanta("Hola Santa, ¿puedo entrar?", "solicitudPermiso", "santaClaus");
 
         // Paso 2: Recibir respuesta de Santa
         ACLMessage respuestaSanta = blockingReceive(MessageTemplate.MatchSender(new AID("santaClaus", AID.ISLOCALNAME)));
@@ -41,8 +41,8 @@ public class MiAgente extends Agent {
         }
     }
 
-    private void enviarMensaje(String contenido, String tipo, String receptor) {
-        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+    private void enviarMensajeSanta(String contenido, String tipo, String receptor) {
+        ACLMessage msg = new ACLMessage(ACLMessage.PROPOSE);
         msg.addReceiver(new AID(receptor, AID.ISLOCALNAME)); // Especifica el receptor
         msg.setContent(contenido); // Contenido del mensaje
         msg.addUserDefinedParameter("tipo", tipo); // Tipo de solicitud

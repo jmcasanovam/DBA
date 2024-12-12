@@ -1,9 +1,11 @@
 package proyecto;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 
 import java.io.BufferedReader;
@@ -253,18 +255,20 @@ public class Entorno extends Agent {
                 @Override
                 public void action() {
                     switch (step) {
-                        case 0 -> {
+                        case 0 -> { //le pregunto al elfo si puedo hablar con el
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-                            msg.setConversationId("elfo-channel");
-                            msg.setContent("Bro podemos hablar en plan");
+                            msg.addReceiver(new AID("elfo", AID.ISLOCALNAME));
+                            msg.setContent("Bro podemos hablar En Plan");
+                            msg.addUserDefinedParameter("idioma", "es"); //idioma fi o es
                             myAgent.send(msg);
                             step = 1;
                         }
-                        case 1 -> {
-                            ACLMessage msg = myAgent.blockingReceive();
-                            if (msg.getConversationId().equals("elfo-channel") && msg.getPerformative() == ACLMessage.AGREE) {
+                        case 1 -> { //recibo si puedo hablar con el elfo y le pido traduccion sobre como preguntar contraseña a santa
+                            ACLMessage msg = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
+                            if (msg!=null && msg.getPerformative() == ACLMessage.AGREE) {
                                 ACLMessage replay = msg.createReply(ACLMessage.INFORM);
-                                replay.setContent("Bro como le pido la contraseña en plan");
+                                replay.setContent("Bro como le pido la contraseña En Plan");
+                                msg.addUserDefinedParameter("idioma", "es"); //idioma fi o es
                                 this.myAgent.send(replay);
                                 step = 2;
                             }
@@ -273,13 +277,14 @@ public class Entorno extends Agent {
                                 myAgent.doDelete();
                             }
                         }
-                        case 2 ->{
-                            ACLMessage msg = myAgent.blockingReceive();
-                            if (msg.getConversationId().equals("elfo-channel") &&msg.getPerformative() == ACLMessage.INFORM) {
+                        case 2 ->{ //recibo la traduccion de como preguntar la contraseña y se la paso a santa
+                            ACLMessage msg = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
+                            if (msg!=null &&msg.getPerformative() == ACLMessage.INFORM) {
                                 System.out.println("Agent receive: " + msg.getContent());
                                 ACLMessage msg2 = new ACLMessage(ACLMessage.PROPOSE);
-                                msg.addReceiver(new AID("mjcobo-receiver", AID.ISLOCALNAME));
+                                msg2.addReceiver(new AID("santaClaus", AID.ISLOCALNAME));
                                 msg2.setContent(msg.getContent());
+                                msg2.addUserDefinedParameter("tipo", "solicitudPermiso");
                                 myAgent.send(msg2);
                                 step = 3;
                             } else {
@@ -287,34 +292,32 @@ public class Entorno extends Agent {
                                 myAgent.doDelete();
                             }
                         }
-                        case 3 ->{
-                            ACLMessage response = myAgent.blockingReceive();
-                            if (response != null && response.getConversationId().equals("santa-channel") && response.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
-                                // Mandar la respuesta al canal "elfo-channel"
+                        case 3 ->{ //recibo de santa la respuesta
+                            ACLMessage response = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("santaClaus", AID.ISLOCALNAME)));
+                            if (response != null && response.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
+                                // Mandar la respuesta a elfo
                                 ACLMessage replyToElfo = new ACLMessage(ACLMessage.INFORM);
-                                replyToElfo.setConversationId("elfo-channel");
+                                replyToElfo.addReceiver(new AID("elfo", AID.ISLOCALNAME));
+                                replyToElfo.addUserDefinedParameter("idioma", "fi"); //idioma fi o es
                                 replyToElfo.setContent(response.getContent());
                                 myAgent.send(replyToElfo);
 
-                                // Recibir la respuesta del canal "elfo-channel"
-                                ACLMessage elfoResponse = myAgent.blockingReceive();
-                                if (elfoResponse != null && elfoResponse.getConversationId().equals("elfo-channel")) {
-                                    String[] trustArray = elfoResponse.getContent().split(",");
-                                    boolean confio = true;
-                                    for (String trust : trustArray) {
-                                        if (trust.equalsIgnoreCase("no confio")) {
-                                            confio = false;
-                                            break;
-                                        }
-                                    }
-                                    if (!confio) {
+                                // Recibir la respuesta de elfo
+                                ACLMessage elfoResponse = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
+                                if (elfoResponse != null) {
+                                    
+                                    //limpio el mensaje
+                                    String contrasena = elfoResponse.getContent().replaceAll("Bro ", "");
+                                    contrasena = contrasena.replaceAll(" En Plan", "");
+
+                                    if("No se permite acceso".equals(contrasena)){
                                         step = 0; // Reinicia el comportamiento
                                         return;
                                     }
 
-                                    // Crear nuevo canal "rudolph-channel"
+                                    // Hablamos con rudolf
                                     ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
-                                    rudolphRequest.setConversationId("rudolph-channel");
+                                    replyToElfo.addReceiver(new AID("rudolf", AID.ISLOCALNAME));
                                     rudolphRequest.setContent("Dame coordenadas");
                                     myAgent.send(rudolphRequest);
                                     step = 4;
@@ -328,17 +331,79 @@ public class Entorno extends Agent {
                             }
                         }
                         case 4 -> {
-                            ACLMessage rudolphResponse = myAgent.blockingReceive();
-                            if (rudolphResponse != null && rudolphResponse.getConversationId().equals("rudolph-channel")) {
+                            ACLMessage rudolphResponse = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("rudolf", AID.ISLOCALNAME)));
+                            if (rudolphResponse != null) {
                                 String content = rudolphResponse.getContent();
-                                if (content.equalsIgnoreCase("No hay enemigos")) {
+                                if (content.equalsIgnoreCase("No quedan mas renos disponibles")) {
                                     System.out.println("No hay enemigos restantes.");
-                                    step = -1; // Termina el comportamiento
+                                    step = 5; // Termina el comportamiento
                                 } else {
                                     System.out.println("Recibidas coordenadas: " + content);
                                     // Añadir el comportamiento de movimiento
-                                    filaObjetivo=0;
-                                    columnaObjetivo=0;
+                                    String[] coordenadas = content.split(","); 
+                                    filaObjetivo=Integer.parseInt(coordenadas[0]);
+                                    columnaObjetivo=Integer.parseInt(coordenadas[1]);
+                                    this.myAgent.addBehaviour(new TickerBehaviour(this.myAgent, 500) {
+                                        @Override
+                                        protected void onTick() {
+                                            if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
+                                                mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
+
+                                                cargarVision();
+                                                jugador.moverse();
+                                                mostrarMapa();
+                                            } else {
+                                                stop(); // Detener el comportamiento
+                                            }
+                                        }
+                                    });
+
+                                    // Pedir nuevas coordenadas
+                                    ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
+                                    rudolphRequest.addReceiver(new AID("rudolf", AID.ISLOCALNAME));
+                                    rudolphRequest.setContent("Dame coordenadas");
+                                    myAgent.send(rudolphRequest);
+                                }
+                            } else {
+                                System.out.println("Error en la respuesta de Rudolph.");
+                                myAgent.doDelete();
+                            }
+                        }
+                        case 5->{
+                            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                            msg.addReceiver(new AID("elfo", AID.ISLOCALNAME));
+                            msg.setContent("Bro donde esta tu casa En Plan");
+                            msg.addUserDefinedParameter("idioma", "es"); //idioma fi o es
+                            myAgent.send(msg);
+                            
+                            ACLMessage msg2 = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
+                            if (msg2!=null &&msg.getPerformative() == ACLMessage.INFORM) {
+                                System.out.println("Agent receive: " + msg2.getContent());
+                                ACLMessage casasanta = new ACLMessage(ACLMessage.INFORM);
+                                casasanta.addReceiver(new AID("santaClaus", AID.ISLOCALNAME));
+                                casasanta.setContent(msg.getContent());
+                                casasanta.addUserDefinedParameter("tipo", "solicitudCoordenadas");
+                                myAgent.send(casasanta);
+                                step = 6;
+                            } else {
+                                System.out.println("Error in the coversation protocol - step" + 2);
+                                myAgent.doDelete();
+                            }
+                        }
+                        case 6 ->{
+                            ACLMessage response = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("santaClaus", AID.ISLOCALNAME)));
+                            if (response != null && response.getPerformative() == ACLMessage.INFORM) {
+                                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                                msg.addReceiver(new AID("elfo", AID.ISLOCALNAME));
+                                msg.setContent(response.getContent());
+                                msg.addUserDefinedParameter("idioma", "fi"); //idioma fi o es
+                                myAgent.send(msg);
+                                
+                                ACLMessage msg2 = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
+                                if (msg2!=null &&msg.getPerformative() == ACLMessage.INFORM) {
+                                    String[] coordenadas = msg2.getContent().split(","); 
+                                    filaObjetivo=Integer.parseInt(coordenadas[0]);
+                                    columnaObjetivo=Integer.parseInt(coordenadas[1]);
                                     this.myAgent.addBehaviour(new TickerBehaviour(this.myAgent, 500) {
                                         @Override
                                         protected void onTick() {
@@ -354,16 +419,35 @@ public class Entorno extends Agent {
                                             }
                                         }
                                     });
-
-                                    // Pedir nuevas coordenadas
-                                    ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
-                                    rudolphRequest.setConversationId("rudolph-channel");
-                                    rudolphRequest.setContent("Dame coordenadas");
-                                    myAgent.send(rudolphRequest);
+                                    step=7;
                                 }
+                            }
+                        }
+                        case 7 ->{
+                            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                            msg.addReceiver(new AID("elfo", AID.ISLOCALNAME));
+                            msg.setContent("Bro ya he llegado En Plan");
+                            msg.addUserDefinedParameter("idioma", "es"); //idioma fi o es
+                            myAgent.send(msg);
+                            
+                            ACLMessage msg2 = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
+                            if (msg2!=null &&msg.getPerformative() == ACLMessage.INFORM) {
+                                System.out.println("Agent receive: " + msg2.getContent());
+                                ACLMessage casasanta = new ACLMessage(ACLMessage.INFORM);
+                                casasanta.addReceiver(new AID("santaClaus", AID.ISLOCALNAME));
+                                casasanta.setContent(msg.getContent());
+                                casasanta.addUserDefinedParameter("tipo", "llegada");
+                                myAgent.send(casasanta);
+                                step = 8;
                             } else {
-                                System.out.println("Error en la respuesta de Rudolph.");
+                                System.out.println("Error in the coversation protocol - step" + 2);
                                 myAgent.doDelete();
+                            }
+                        }
+                        case 8->{
+                            ACLMessage response = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("santaClaus", AID.ISLOCALNAME)));
+                            if (response != null && response.getPerformative() == ACLMessage.INFORM) {
+                                System.out.println(response.getContent());
                             }
                         }
                         case -1 -> {

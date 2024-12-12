@@ -20,11 +20,11 @@ public class Rudolf extends Agent {
 
     public Rudolf() {
         coordenadasRenos = new ArrayList<>();
-        coordenadasRenos.add("90, 10");
-        coordenadasRenos.add("90, 20");
-        coordenadasRenos.add("90, 30");
-        coordenadasRenos.add("90, 40");
-        coordenadasRenos.add("90, 50");
+        coordenadasRenos.add("90,10");
+        coordenadasRenos.add("90,20");
+        coordenadasRenos.add("90,30");
+        coordenadasRenos.add("90,40");
+        coordenadasRenos.add("90,50");
     }
     public Rudolf(ArrayList<String> coordenadasRenos) {
         this.coordenadasRenos = coordenadasRenos;
@@ -51,7 +51,7 @@ public class Rudolf extends Agent {
                             System.out.println("Enviando coordenadas: " + coordenadasRenos.get(indiceRenoActual));
                             indiceRenoActual++;  // Avanzar al siguiente reno
                         } else {
-                            reply.setContent("No quedan más renos disponibles.");
+                            reply.setContent("No quedan mas renos disponibles.");
                             System.out.println("Mensaje final: No quedan más renos.");
                         }
                     } else {
