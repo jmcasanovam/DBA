@@ -43,6 +43,7 @@ public class Santa extends Agent {
                     myAgent.send(reply);
                     System.out.println("Respuesta enviada: " + reply.getContent());
                 } else {
+                    ACLMessage reply = msg.createReply();
                     reply.setPerformative(ACLMessage.FAILURE);
                     reply.setContent("Hyvää joulua " + "Error en la solicitud" + " Nähdään pian");
                     myAgent.send(reply);

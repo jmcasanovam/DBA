@@ -29,6 +29,7 @@ public class Elfo extends Agent {
                     
                     System.out.println("Traducción enviada: " + traduccion);
                 } else {
+                    ACLMessage reply = msg.createReply();
                     reply.setPerformative(ACLMessage.FAILURE);
                     reply.setContent("Error en la traducción");
                     myAgent.send(reply);

@@ -2,6 +2,10 @@ package proyecto;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
+
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -44,37 +48,6 @@ public class Entorno extends Agent {
         configurarInterfaz();
         mostrarMapa();
     }
-
-    public void ejecucion3 (){
-        // establecer canal de comunicación con el elfo
-        // mandar mensaje a elfo
-        // recibir mensaje de elfo
-        // establecer canal de comuncación con santa
-        while(mensaje de santa es malo){
-            // mandar mensaje a santa
-            // recibirlo de santa
-            // mandar mensaje a elfo
-            // recibir mensaje de elfo
-        }
-
-        int contrasena = "por favor"; // guardar contraseña recibida de santa
-        
-        // establecer canal de comunicación con rudolph
-        // pedir coordenadas a rudolf
-        while(rudolf devuelve coordenadas /*implica mandarle la contraseña y recibir un mensaje*/){
-            // rudolf te dara las coordenadas
-            int filao = 0;
-            int colo = 0;
-            this.filaObjetivo=filao;
-            this.columnaObjetivo=colo;
-            jugador.setObjetivo(filao, colo);
-            ejecucion();
-            // pedir coordenadas de nuevo
-        }
-        // al recibir 
-    }
-
-
 
     private void configurarInterfaz() {
         frame = new JFrame("Mapa Visual");
@@ -276,36 +249,134 @@ public class Entorno extends Agent {
 
             // Añadir el comportamiento de pedir contraseña
             addBehaviour(new CyclicBehaviour() {
+                int step = 0;
                 @Override
                 public void action() {
-                    ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-                    msg.setConversationId("elfo-channel");
-                    myAgent.send(msg);
+                    switch (step) {
+                        case 0 -> {
+                            ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+                            msg.setConversationId("elfo-channel");
+                            msg.setContent("Bro podemos hablar en plan");
+                            myAgent.send(msg);
+                            step = 1;
+                        }
+                        case 1 -> {
+                            ACLMessage msg = myAgent.blockingReceive();
+                            if (msg.getConversationId().equals("elfo-channel") && msg.getPerformative() == ACLMessage.AGREE) {
+                                ACLMessage replay = msg.createReply(ACLMessage.INFORM);
+                                replay.setContent("Bro como le pido la contraseña en plan");
+                                this.myAgent.send(replay);
+                                step = 2;
+                            }
+                            else {
+                                System.out.println("Error in the coversation protocol - step" + 1);
+                                myAgent.doDelete();
+                            }
+                        }
+                        case 2 ->{
+                            ACLMessage msg = myAgent.blockingReceive();
+                            if (msg.getConversationId().equals("elfo-channel") &&msg.getPerformative() == ACLMessage.INFORM) {
+                                System.out.println("Agent receive: " + msg.getContent());
+                                ACLMessage msg2 = new ACLMessage(ACLMessage.PROPOSE);
+                                msg.addReceiver(new AID("mjcobo-receiver", AID.ISLOCALNAME));
+                                msg2.setContent(msg.getContent());
+                                myAgent.send(msg2);
+                                step = 3;
+                            } else {
+                                System.out.println("Error in the coversation protocol - step" + 2);
+                                myAgent.doDelete();
+                            }
+                        }
+                        case 3 ->{
+                            ACLMessage response = myAgent.blockingReceive();
+                            if (response != null && response.getConversationId().equals("santa-channel") && response.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
+                                // Mandar la respuesta al canal "elfo-channel"
+                                ACLMessage replyToElfo = new ACLMessage(ACLMessage.INFORM);
+                                replyToElfo.setConversationId("elfo-channel");
+                                replyToElfo.setContent(response.getContent());
+                                myAgent.send(replyToElfo);
 
-                    ACLMessage msg = myAgent.blockingReceive();
+                                // Recibir la respuesta del canal "elfo-channel"
+                                ACLMessage elfoResponse = myAgent.blockingReceive();
+                                if (elfoResponse != null && elfoResponse.getConversationId().equals("elfo-channel")) {
+                                    String[] trustArray = elfoResponse.getContent().split(",");
+                                    boolean confio = true;
+                                    for (String trust : trustArray) {
+                                        if (trust.equalsIgnoreCase("no confio")) {
+                                            confio = false;
+                                            break;
+                                        }
+                                    }
+                                    if (!confio) {
+                                        step = 0; // Reinicia el comportamiento
+                                        return;
+                                    }
 
-                    if(msg.getConversationId().equals())
-                    
+                                    // Crear nuevo canal "rudolph-channel"
+                                    ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
+                                    rudolphRequest.setConversationId("rudolph-channel");
+                                    rudolphRequest.setContent("Dame coordenadas");
+                                    myAgent.send(rudolphRequest);
+                                    step = 4;
+                                } else {
+                                    System.out.println("Error en la respuesta del elfo.");
+                                    myAgent.doDelete();
+                                }
+                            } else {
+                                System.out.println("Error in the conversation protocol - step " + 3);
+                                myAgent.doDelete();
+                            }
+                        }
+                        case 4 -> {
+                            ACLMessage rudolphResponse = myAgent.blockingReceive();
+                            if (rudolphResponse != null && rudolphResponse.getConversationId().equals("rudolph-channel")) {
+                                String content = rudolphResponse.getContent();
+                                if (content.equalsIgnoreCase("No hay enemigos")) {
+                                    System.out.println("No hay enemigos restantes.");
+                                    step = -1; // Termina el comportamiento
+                                } else {
+                                    System.out.println("Recibidas coordenadas: " + content);
+                                    // Añadir el comportamiento de movimiento
+                                    filaObjetivo=0;
+                                    columnaObjetivo=0;
+                                    this.myAgent.addBehaviour(new TickerBehaviour(this.myAgent, 500) {
+                                        @Override
+                                        protected void onTick() {
+                                            if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
+                                                mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
+
+                                                cargarVision();
+                                                jugador.moverse();
+                                                mostrarMapa();
+                                            } else {
+                                                jugador.finalizar();
+                                                stop(); // Detener el comportamiento
+                                            }
+                                        }
+                                    });
+
+                                    // Pedir nuevas coordenadas
+                                    ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
+                                    rudolphRequest.setConversationId("rudolph-channel");
+                                    rudolphRequest.setContent("Dame coordenadas");
+                                    myAgent.send(rudolphRequest);
+                                }
+                            } else {
+                                System.out.println("Error en la respuesta de Rudolph.");
+                                myAgent.doDelete();
+                            }
+                        }
+                        case -1 -> {
+                            System.out.println("El comportamiento cíclico ha terminado.");
+                            myAgent.removeBehaviour(this);
+                        }
+                        default -> {
+                            System.out.println("Error in the coversation protocol - step " + 2);
+                            myAgent.doDelete();
+                        }
+                    }
                 }
-            }
-        );
-
-            // Añadir el comportamiento de movimiento
-                                                                        addBehaviour(new TickerBehaviour(this, 500) {
-                                                                            @Override
-                                                                            protected void onTick() {
-                                                                                if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
-                                                                                    mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
-                                                                                    
-                                                                                    cargarVision();
-                                                                                    jugador.moverse();
-                                                                                    mostrarMapa();
-                                                                                } else {
-                                                                                    jugador.finalizar();
-                                                                                    stop(); // Detener el comportamiento
-                                                                                }
-                                                                            }
-                                                                        });
+            });
         }
     }
 
