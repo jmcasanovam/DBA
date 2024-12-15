@@ -13,6 +13,7 @@ import java.io.File;
 import jade.lang.acl.ACLMessage;
 import jade.core.AID;
 import jade.wrapper.ContainerController;
+import java.util.ArrayList;
 
 
 //public class Proyecto {
@@ -81,11 +82,41 @@ public class Proyecto {
 
     public static void main(String[] args) {
         try {
-            // Inicializar JADE Runtime
+//            // Crear un JFileChooser para seleccionar el archivo del mapa
+
+//
+//                // Verificar que el archivo sea un archivo de texto
+//                if (!mapPath.endsWith(".txt")) {
+//                    JOptionPane.showMessageDialog(null, "El archivo seleccionado no es un archivo de texto.", "Error", JOptionPane.ERROR_MESSAGE);
+//                    return; // Finalizar el programa
+//                }            // Inicializar JADE Runtime
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Selecciona un archivo de mapa");
+            int userSelection = fileChooser.showOpenDialog(null);
+
+            // Validar la selección del archivo
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                String mapPath = selectedFile.getAbsolutePath();
+            }
             Runtime rt = Runtime.instance();
             Profile profile = new ProfileImpl();
             profile.setParameter(Profile.MAIN_HOST, "localhost"); // Host local
             profile.setParameter(Profile.CONTAINER_NAME, "contenedor1");
+            
+            int agentRow = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la fila inicial del agente:"));
+            int agentCol = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la columna inicial del agente:"));
+            int cantRenos = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número de renos:"));
+            
+            ArrayList<String> coordenadasRenos = new ArrayList<String>();
+            JPanel panelRenos = new JPanel();
+            for(int i = 0; i < cantRenos; i++){
+                int renoRow = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la fila del reno " + (i + 1) + ":"));
+                int renoCol = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la columna del reno " + (i + 1) + ":"));
+                
+                coordenadasRenos.add(Integer.toString(renoRow) + "," + Integer.toString(renoCol)); // Cambiar strings por ints para poder traspasar los datos?
+            }
             
             ContainerController cc = rt.createAgentContainer(profile);
 
