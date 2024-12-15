@@ -318,7 +318,7 @@ public class Entorno extends Agent {
                                     // Hablamos con rudolf
                                     ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
                                     replyToElfo.addReceiver(new AID("rudolf", AID.ISLOCALNAME));
-                                    rudolphRequest.setContent("Dame coordenadas");
+                                    rudolphRequest.setContent(contrasena);
                                     myAgent.send(rudolphRequest);
                                     step = 4;
                                 } else {

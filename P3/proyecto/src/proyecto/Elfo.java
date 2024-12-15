@@ -19,15 +19,24 @@ public class Elfo extends Agent {
                     System.out.println("Mensaje recibido: " + contenido);
                     System.out.println("Idioma especificado: " + idioma);// Puede ser finlandes o español (fi, es)
                     
-                    // Traducir el mensaje según el idioma
-                    String traduccion = traducir(contenido, idioma);
+                    if("Bro podemos hablar En Plan".equals(contenido)){ // Recibir solicitud de hablar
+                        // Crear y enviar la respuesta
+                        ACLMessage reply = msg.createReply();
+                        reply.setPerformative(ACLMessage.AGREE);
+                        myAgent.send(reply);
+                    }
+                    else{
+                        // Traducir el mensaje según el idioma
+                        String traduccion = traducir(contenido, idioma);
 
-                    // Crear y enviar la respuesta
-                    ACLMessage reply = msg.createReply();
-                    reply.setContent(traduccion);
-                    myAgent.send(reply);
-                    
-                    System.out.println("Traducción enviada: " + traduccion);
+                        // Crear y enviar la respuesta
+                        ACLMessage reply = msg.createReply();
+                        reply.setPerformative(ACLMessage.INFORM);
+                        reply.setContent(traduccion);
+                        myAgent.send(reply);
+
+                        System.out.println("Traducción enviada: " + traduccion);
+                    }
                 } else {
                     ACLMessage reply = msg.createReply();
                     reply.setPerformative(ACLMessage.FAILURE);
@@ -43,7 +52,7 @@ public class Elfo extends Agent {
                     translatedContent = "Rakas Joulupukki " + texto.replace("Bro ", "").replace(" En Plan", "") + " Kiitos";
                     
                 } else if ("fi".equals(idioma)) {
-                    translatedContent = "Bro " + texto.replace("Rakas Joulupukki ", "").replace(" Kiitos", "") + " En Plan";
+                    translatedContent = "Bro " + texto.replace("Hyvää joulua ", "").replace(" Nähdään pian", "") + " En Plan";
                 }
                 return translatedContent;
             }
