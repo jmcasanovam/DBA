@@ -10,9 +10,19 @@ import java.util.Random;
  */
 
 public class Santa extends Agent {
-    private int [] coordenadas_casa = {90, 0};
+    private int [] coordenadas_casa;
+    public Santa() {
+       coordenadas_casa = new int[]{0, 0}; 
+    }
+    public Santa(int [] coordenadas){
+        this.coordenadas_casa = coordenadas;
+    }
     @Override
     protected void setup() {
+        Object[] args = getArguments();
+        if (args != null && args.length == 1)
+            coordenadas_casa = (int[]) args[0];
+            
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {

@@ -119,6 +119,9 @@ public class Proyecto {
                 coordenadasRenos.add(Integer.toString(renoRow) + "," + Integer.toString(renoCol)); // Cambiar strings por ints para poder traspasar los datos?
             }
             
+            int santaRow = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la fila de Santa:"));
+            int santaCol = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la columna de Santa:"));
+            int[] coordenadasSanta = {santaRow, santaCol};
             
             ContainerController cc = rt.createAgentContainer(profile);
             
@@ -135,9 +138,13 @@ public class Proyecto {
                     coordenadasRenos
                 };
                 
+                Object[] parametersSanta = new Object[]{
+                    coordenadasSanta
+                };
+                
                 AgentController miAgente = cc.createNewAgent("miAgente", "proyecto.Entorno", parameters);
                 miAgente.start();
-                cc.createNewAgent("santaClaus", "proyecto.Santa", null).start();
+                cc.createNewAgent("santaClaus", "proyecto.Santa", parametersSanta).start();
                 cc.createNewAgent("elfo", "proyecto.Elfo", null).start();
                 cc.createNewAgent("rudolf", "proyecto.Rudolf", parametersRenos).start();
 

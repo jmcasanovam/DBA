@@ -1,4 +1,4 @@
-package proyecto;
+    package proyecto;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
