@@ -17,6 +17,8 @@ public class MapaVisual extends JPanel {
         int tileHeight = getHeight() / mapa.length;
         int tileSize = Math.min(tileWidth, tileHeight);
         
+        Color marron = new Color(60, 122, 66);
+        
         for (int i = 0; i < mapa.length; i++) {
             for (int j = 0; j < mapa[i].length; j++) {
                 // Dibuja diferentes colores según el valor en el mapa
@@ -24,11 +26,15 @@ public class MapaVisual extends JPanel {
                     g.setColor(Color.WHITE); // Celda vacía
                 } else if (mapa[i][j] == -1) {
                     g.setColor(Color.BLACK); // Muro
+                }else if (mapa[i][j] == 4) {
+                    g.setColor(Color.RED); // Objetivo
                 } else if (mapa[i][j] == 1) {
                     g.setColor(Color.BLUE); // Jugador
-                } else if (mapa[i][j] == -2) {
-                    g.setColor(Color.RED); // Objetivo
-                }
+                } else if (mapa[i][j] == 2) {
+                    g.setColor(marron); // Objetivo
+                } else if (mapa[i][j] == 3) {
+                    g.setColor(Color.YELLOW); // Objetivo
+                } 
 
                 // Dibuja el rectángulo de la celda
                 g.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);

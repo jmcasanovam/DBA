@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 public class Entorno extends Agent {
@@ -73,8 +75,6 @@ public class Entorno extends Agent {
                 Casilla casilla = mapa.get(i * ancho + j);
                 if (i == jugador.getFilaActual() && j == jugador.getColumnaActual()) {
                     matriz[i][j] = 1; // Jugador
-                } else if (i == filaObjetivo && j == columnaObjetivo) {
-                    matriz[i][j] = 2; // Objetivo
                 } else {
                     matriz[i][j] = casilla.getValor();
                 }
@@ -118,6 +118,7 @@ public class Entorno extends Agent {
 
     public void mostrarMapa() {
         int[][] mapaVisual = convertirMapa();
+        System.out.println("Este es el valor"+ mapaVisual[90][0]);
         panelMapa.actualizarMapa(mapaVisual); // Actualiza la visualización gráfica
 
     }
@@ -230,6 +231,22 @@ public class Entorno extends Agent {
 
     private int getValorMapa(int fila, int columna) {
         return mapa.get(fila * ancho + columna).getValor();
+    }
+    
+    private void moverJugador(boolean termina) throws InterruptedException{                                 
+        System.out.println("Voy a mover el jugador!");
+        while(jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo){
+            Thread.sleep(100);
+            mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
+           cargarVision();
+           jugador.moverse();
+           mostrarMapa();
+        }
+        
+        if(termina){
+            jugador.finalizar();
+        }
+                              
     }
 
     @Override
@@ -352,24 +369,14 @@ public class Entorno extends Agent {
                                     String[] coordenadas = content.split(","); 
                                     filaObjetivo=Integer.parseInt(coordenadas[0]);
                                     columnaObjetivo=Integer.parseInt(coordenadas[1]);
-                                    mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, -2));
+                                    mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, 2));
                                     jugador.setObjetivo(filaObjetivo, columnaObjetivo);
-                                    this.myAgent.addBehaviour(new TickerBehaviour(this.myAgent, 500) {
-                                        @Override
-                                        protected void onTick() {
-                                             System.out.println("aAAAAAAAAAAAAAAAAAA!");
-
-                                            if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
-                                                mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
-
-                                                cargarVision();
-                                                jugador.moverse();
-                                                mostrarMapa();
-                                            } else {
-                                                stop(); // Detener el comportamiento
-                                            }
-                                        }
-                                    });
+                                    try {
+                                        moverJugador(false);
+                                    } catch (InterruptedException ex) {
+                                        Logger.getLogger(Entorno.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                    mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, 3));
                                     System.out.println("FILA:"+jugador.getFilaActual()+", Col:"+jugador.getColumnaActual());
 
 
@@ -422,23 +429,13 @@ public class Entorno extends Agent {
                                     String[] coordenadas = aux.trim().split(","); 
                                     filaObjetivo=Integer.parseInt(coordenadas[0]);
                                     columnaObjetivo=Integer.parseInt(coordenadas[1]);
-                                    mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, -2));
+                                    mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, 4));
                                     jugador.setObjetivo(filaObjetivo, columnaObjetivo);
-                                    this.myAgent.addBehaviour(new TickerBehaviour(this.myAgent, 500) {
-                                        @Override
-                                        protected void onTick() {
-                                            if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
-                                                mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
-
-                                                cargarVision();
-                                                jugador.moverse();
-                                                mostrarMapa();
-                                            } else {
-                                                jugador.finalizar();
-                                                stop(); // Detener el comportamiento
-                                            }
-                                        }
-                                    });
+                                    try {
+                                        moverJugador(true);
+                                    } catch (InterruptedException ex) {
+                                        Logger.getLogger(Entorno.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                     step=7;
                                 }
                             }
