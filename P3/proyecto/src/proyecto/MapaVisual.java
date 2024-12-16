@@ -26,7 +26,7 @@ public class MapaVisual extends JPanel {
                     g.setColor(Color.BLACK); // Muro
                 } else if (mapa[i][j] == 1) {
                     g.setColor(Color.BLUE); // Jugador
-                } else if (mapa[i][j] == 2) {
+                } else if (mapa[i][j] == -2) {
                     g.setColor(Color.RED); // Objetivo
                 }
 

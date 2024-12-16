@@ -19,10 +19,11 @@ public class Elfo extends Agent {
                     System.out.println("Mensaje recibido: " + contenido);
                     System.out.println("Idioma especificado: " + idioma);// Puede ser finlandes o español (fi, es)
                     
-                    if("Bro podemos hablar En Plan".equals(contenido)){ // Recibir solicitud de hablar
+                    if(msg.getPerformative() == ACLMessage.REQUEST){ // Recibir solicitud de hablar
                         // Crear y enviar la respuesta
                         ACLMessage reply = msg.createReply();
                         reply.setPerformative(ACLMessage.AGREE);
+                        System.out.println("Te acepto la comunicacion");
                         myAgent.send(reply);
                     }
                     else{

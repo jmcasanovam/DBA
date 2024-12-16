@@ -27,6 +27,7 @@ public class Entorno extends Agent {
 
     private MapaVisual panelMapa;
     private JFrame frame;
+    private String contrasena = "";
 
 
 // Constructor sin parámetros
@@ -233,11 +234,14 @@ public class Entorno extends Agent {
 
     @Override
     protected void setup() {
+        
         Object[] args = getArguments();
         if (args != null && args.length == 3) {
             this.nombreArchivo = (String) args[0];
             int filaJ = (int) args[1];
             int columnaJ = (int) args[2];
+            
+            
 
             this.mapa = new ArrayList<>();
             leerMapa();
@@ -267,8 +271,8 @@ public class Entorno extends Agent {
                             ACLMessage msg = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
                             if (msg!=null && msg.getPerformative() == ACLMessage.AGREE) {
                                 ACLMessage replay = msg.createReply(ACLMessage.INFORM);
-                                replay.setContent("Bro como le pido la contraseña En Plan");
-                                msg.addUserDefinedParameter("idioma", "es"); //idioma fi o es
+                                replay.setContent("Bro me dices la contrasena En Plan");
+                                replay.addUserDefinedParameter("idioma", "es"); //idioma fi o es
                                 this.myAgent.send(replay);
                                 step = 2;
                             }
@@ -307,17 +311,18 @@ public class Entorno extends Agent {
                                 if (elfoResponse != null) {
                                     
                                     //limpio el mensaje
-                                    String contrasena = elfoResponse.getContent().replaceAll("Bro ", "");
+                                    contrasena = elfoResponse.getContent().replaceAll("Bro ", "");
                                     contrasena = contrasena.replaceAll(" En Plan", "");
-
-                                    if("No se permite acceso".equals(contrasena)){
+                                    
+                                    System.out.println("la contrasena desde entorno es " + contrasena);
+                                    if("No".equals(contrasena)){
                                         step = 0; // Reinicia el comportamiento
                                         return;
                                     }
 
                                     // Hablamos con rudolf
                                     ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
-                                    replyToElfo.addReceiver(new AID("rudolf", AID.ISLOCALNAME));
+                                    rudolphRequest.addReceiver(new AID("rudolf", AID.ISLOCALNAME));
                                     rudolphRequest.setContent(contrasena);
                                     myAgent.send(rudolphRequest);
                                     step = 4;
@@ -337,15 +342,23 @@ public class Entorno extends Agent {
                                 if (content.equalsIgnoreCase("No quedan mas renos disponibles")) {
                                     System.out.println("No hay enemigos restantes.");
                                     step = 5; // Termina el comportamiento
-                                } else {
+                                }else if(content.equalsIgnoreCase("Denegado")){
+                                    step = 0;
+                                    return;
+                                }
+                                else {
                                     System.out.println("Recibidas coordenadas: " + content);
                                     // Añadir el comportamiento de movimiento
                                     String[] coordenadas = content.split(","); 
                                     filaObjetivo=Integer.parseInt(coordenadas[0]);
                                     columnaObjetivo=Integer.parseInt(coordenadas[1]);
+                                    mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, -2));
+                                    jugador.setObjetivo(filaObjetivo, columnaObjetivo);
                                     this.myAgent.addBehaviour(new TickerBehaviour(this.myAgent, 500) {
                                         @Override
                                         protected void onTick() {
+                                             System.out.println("aAAAAAAAAAAAAAAAAAA!");
+
                                             if (jugador.getFilaActual() != filaObjetivo || jugador.getColumnaActual() != columnaObjetivo) {
                                                 mapa.get(jugador.getFilaActual() * ancho + jugador.getColumnaActual()).sumarPaso();
 
@@ -357,11 +370,13 @@ public class Entorno extends Agent {
                                             }
                                         }
                                     });
+                                    System.out.println("FILA:"+jugador.getFilaActual()+", Col:"+jugador.getColumnaActual());
+
 
                                     // Pedir nuevas coordenadas
                                     ACLMessage rudolphRequest = new ACLMessage(ACLMessage.REQUEST);
                                     rudolphRequest.addReceiver(new AID("rudolf", AID.ISLOCALNAME));
-                                    rudolphRequest.setContent("Dame coordenadas");
+                                    rudolphRequest.setContent(contrasena);
                                     myAgent.send(rudolphRequest);
                                 }
                             } else {
@@ -381,7 +396,7 @@ public class Entorno extends Agent {
                                 System.out.println("Agent receive: " + msg2.getContent());
                                 ACLMessage casasanta = new ACLMessage(ACLMessage.INFORM);
                                 casasanta.addReceiver(new AID("santaClaus", AID.ISLOCALNAME));
-                                casasanta.setContent(msg.getContent());
+                                casasanta.setContent(msg2.getContent());
                                 casasanta.addUserDefinedParameter("tipo", "solicitudCoordenadas");
                                 myAgent.send(casasanta);
                                 step = 6;
@@ -400,10 +415,15 @@ public class Entorno extends Agent {
                                 myAgent.send(msg);
                                 
                                 ACLMessage msg2 = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
-                                if (msg2!=null &&msg.getPerformative() == ACLMessage.INFORM) {
-                                    String[] coordenadas = msg2.getContent().split(","); 
+                                if (msg2!=null &&msg2.getPerformative() == ACLMessage.INFORM) {
+                                    String aux = msg2.getContent().replaceAll("Bro ", "");
+                                    aux = aux.replaceAll(" En Plan", "");
+                                    System.out.println("Las coordenadas de la casa son "+ aux);
+                                    String[] coordenadas = aux.trim().split(","); 
                                     filaObjetivo=Integer.parseInt(coordenadas[0]);
                                     columnaObjetivo=Integer.parseInt(coordenadas[1]);
+                                    mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, -2));
+                                    jugador.setObjetivo(filaObjetivo, columnaObjetivo);
                                     this.myAgent.addBehaviour(new TickerBehaviour(this.myAgent, 500) {
                                         @Override
                                         protected void onTick() {
@@ -431,7 +451,7 @@ public class Entorno extends Agent {
                             myAgent.send(msg);
                             
                             ACLMessage msg2 = myAgent.blockingReceive(MessageTemplate.MatchSender(new AID("elfo", AID.ISLOCALNAME)));
-                            if (msg2!=null &&msg.getPerformative() == ACLMessage.INFORM) {
+                            if (msg2!=null &&msg2.getPerformative() == ACLMessage.INFORM) {
                                 System.out.println("Agent receive: " + msg2.getContent());
                                 ACLMessage casasanta = new ACLMessage(ACLMessage.INFORM);
                                 casasanta.addReceiver(new AID("santaClaus", AID.ISLOCALNAME));

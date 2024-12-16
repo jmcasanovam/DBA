@@ -17,29 +17,40 @@ public class Santa extends Agent {
             @Override
             public void action() {
                 ACLMessage msg = myAgent.blockingReceive(); // Recibe el mensaje
-                
-                if (msg != null) {
+                if (msg != null && msg.getPerformative() == ACLMessage.PROPOSE) {
                     String contenido = msg.getContent();
                     String tipoMensaje = msg.getUserDefinedParameter("tipo"); // Obtener el tipo de solicitud
                     
-                    System.out.println("Mensaje recibido: " + contenido);
+                    System.out.println("Mensaje recibido desde Santa: " + contenido);
                     System.out.println("Tipo de mensaje: " + tipoMensaje);
                     
                     // Procesar el mensaje según el tipo de solicitud
-                    ACLMessage reply = msg.createReply();
+                    ACLMessage reply = msg.createReply(ACLMessage.ACCEPT_PROPOSAL);
+                    reply.setContent("Hyvää joulua " + generarRespuestaPermiso(contenido)+" Nähdään pian");
+                    
+                    myAgent.send(reply);
+                    System.out.println("Respuesta enviada: " + reply.getContent());
+                    
+                } else if (msg != null && msg.getPerformative() == ACLMessage.INFORM) {
+                    String contenido = msg.getContent();
+                    String tipoMensaje = msg.getUserDefinedParameter("tipo"); // Obtener el tipo de solicitud
+                    
+                    System.out.println("Mensaje recibido desde Santa: " + contenido);
+                    System.out.println("Tipo de mensaje: " + tipoMensaje);
+                    
+                    // Procesar el mensaje según el tipo de solicitud
+                    ACLMessage reply = msg.createReply(ACLMessage.INFORM);
                     switch (tipoMensaje) {
-                        case "solicitudPermiso":
-                            reply.setContent("Hyvää joulua " + generarRespuestaPermiso(contenido)+" Nähdään pian");
-                            break;
                         case "solicitudCoordenadas":
-                            reply.setContent("Hyvää joulua " + coordenadas_casa[0] + ", " + coordenadas_casa[1] + " Nähdään pian");
+                            reply.setContent("Hyvää joulua " + coordenadas_casa[0] + "," + coordenadas_casa[1] + " Nähdään pian");
                             break;
                         case "llegada":
                             reply.setContent("¡Jojojo!");
                             break;
                         default:
-                            reply.setContent("Hyvää joulua " + "Tipo de solicitud desconocido." + " Nähdään pian");
+                            reply.setContent("Hyvää joulua " + "Tipo de solicitud desconocido" + " Nähdään pian");
                     }
+                    
                     myAgent.send(reply);
                     System.out.println("Respuesta enviada: " + reply.getContent());
                 } else {
@@ -58,7 +69,7 @@ public class Santa extends Agent {
                 int resultado = (probabilidad < 80) ? 1 : 0;
 
                 if (resultado == 0) {
-                    return "No se permite el acceso.";
+                    return "No";
                 }else{
                     return contrasena;
                 }

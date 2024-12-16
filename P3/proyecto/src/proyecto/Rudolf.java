@@ -38,9 +38,9 @@ public class Rudolf extends Agent {
             public void action() {
                 ACLMessage msg = myAgent.blockingReceive();  // Recibir mensaje
                 
-                if (msg != null) {
+                if (msg != null && msg.getPerformative() == ACLMessage.REQUEST) {
                     String contenido = msg.getContent();
-                    System.out.println("Mensaje recibido: " + contenido);
+                    System.out.println("Mensaje recibido desde Rudolf: " + contenido);
                     
                     ACLMessage reply = msg.createReply();  // Preparar la respuesta
 
@@ -51,13 +51,14 @@ public class Rudolf extends Agent {
                             System.out.println("Enviando coordenadas: " + coordenadasRenos.get(indiceRenoActual));
                             indiceRenoActual++;  // Avanzar al siguiente reno
                         } else {
-                            reply.setContent("No quedan mas renos disponibles.");
+                            reply.setContent("No quedan mas renos disponibles");
                             System.out.println("Mensaje final: No quedan más renos.");
                         }
                     } else {
-                        reply.setContent("Código incorrecto. Acceso denegado.");
+                        reply.setContent("Denegado");
                         System.out.println("Código inválido recibido.");
                     }
+                    reply.setPerformative(ACLMessage.INFORM);
                     myAgent.send(reply);  // Enviar la respuesta
                 } else {
                     System.out.println("No se recibió ningún mensaje.");
