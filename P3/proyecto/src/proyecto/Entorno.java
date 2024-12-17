@@ -248,6 +248,11 @@ public class Entorno extends Agent {
         }
                               
     }
+    
+    private void limpiarPasosMapa(){
+        for(int i = 0; i < mapa.size(); i++)
+            mapa.get(i).setPasos(0);
+    }
 
     @Override
     protected void setup() {
@@ -357,7 +362,7 @@ public class Entorno extends Agent {
                             if (rudolphResponse != null) {
                                 String content = rudolphResponse.getContent();
                                 if (content.equalsIgnoreCase("No quedan mas renos disponibles")) {
-                                    System.out.println("No hay enemigos restantes.");
+                                    System.out.println("No hay renos restantes.");
                                     step = 5; // Termina el comportamiento
                                 }else if(content.equalsIgnoreCase("Denegado")){
                                     step = 0;
@@ -371,6 +376,7 @@ public class Entorno extends Agent {
                                     columnaObjetivo=Integer.parseInt(coordenadas[1]);
                                     mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, 2));
                                     jugador.setObjetivo(filaObjetivo, columnaObjetivo);
+                                    limpiarPasosMapa();
                                     try {
                                         moverJugador(false);
                                     } catch (InterruptedException ex) {
@@ -431,6 +437,7 @@ public class Entorno extends Agent {
                                     columnaObjetivo=Integer.parseInt(coordenadas[1]);
                                     mapa.set(filaObjetivo*ancho + columnaObjetivo, new Casilla(filaObjetivo, columnaObjetivo, 4));
                                     jugador.setObjetivo(filaObjetivo, columnaObjetivo);
+                                    limpiarPasosMapa();
                                     try {
                                         moverJugador(true);
                                     } catch (InterruptedException ex) {
